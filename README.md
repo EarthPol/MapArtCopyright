@@ -43,6 +43,18 @@ Features:
 - 💡 Toggle Hologram (Redstone Torch)
 - ❌ Close Menu (Barrier)
 
+🧠 Roadmap Ideas
+/mapart claim integration
+
+Export/import system
+
+Duplicate protection for UUID reuse
+
+MapArt whitelist or shareable ownership
+
+👤 Credits
+Developed by GlassMC
+Map art deserves proper credit 🖼️💡
 ---
 
 ## 🔐 Permissions
@@ -59,16 +71,3 @@ mapart.toggle.displayname
 mapart.toggle.hologram
 mapart.info
 
-🧠 Roadmap Ideas
-/mapart claim integration
-
-Export/import system
-
-Duplicate protection for UUID reuse
-
-MapArt whitelist or shareable ownership
-
-👤 Credits
-Developed by GlassMC
-Map art deserves proper credit 🖼️💡
-# MapArtCopyright
