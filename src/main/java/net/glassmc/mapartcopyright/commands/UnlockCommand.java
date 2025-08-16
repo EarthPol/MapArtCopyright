@@ -11,8 +11,12 @@ import net.glassmc.mapartcopyright.database.OwnershipDatabase;
 import net.glassmc.mapartcopyright.economy.EconomyUtil;
 import net.glassmc.mapartcopyright.util.LockUtil;
 import net.glassmc.mapartcopyright.util.UnlockUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.Component;
 
 public class UnlockCommand implements SubCommand {
+
+    private static final MiniMessage MINI = MiniMessage.miniMessage();
 
     @Override
     public String getName() {
@@ -32,14 +36,14 @@ public class UnlockCommand implements SubCommand {
         }
 
         ItemStack item = player.getInventory().getItemInMainHand();
-
-        if (!UnlockUtil.isLocked(item)) {
-            player.sendMessage("§eThis map is not locked.");
+        if (item == null || item.getItemMeta() == null || !(item.getItemMeta() instanceof MapMeta)) {
+            player.sendMessage("§cHold a filled map to unlock it.");
             return;
         }
 
-        if (!(item.getItemMeta() instanceof MapMeta meta)) {
-            player.sendMessage("§cInvalid map metadata.");
+        MapMeta meta = (MapMeta) item.getItemMeta();
+        if (!UnlockUtil.isLocked(item)) {
+            player.sendMessage("§eThis map is not locked.");
             return;
         }
 
@@ -65,12 +69,15 @@ public class UnlockCommand implements SubCommand {
 
         // Restore display name if previously saved in NBT
         String storedName = meta.getPersistentDataContainer().get(LockUtil.MAPART_NAME_KEY, PersistentDataType.STRING);
-        if (storedName != null && (meta.getDisplayName() == null || meta.getDisplayName().isEmpty())) {
-            meta.setDisplayName(storedName);
-            item.setItemMeta(meta);
+        if (storedName != null && meta.displayName() == null) {
+            Component displayName = MINI.deserialize(storedName);
+            meta.displayName(displayName);
         }
 
+        // Unlock the map (custom flag only)
         UnlockUtil.unlock(item);
+        item.setItemMeta(meta);
+
         AuditLogger.log("unlocked", player.getName(), mapUUID);
         player.sendMessage("§aMap unlocked.");
     }

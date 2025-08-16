@@ -12,7 +12,6 @@ public class MapArtCommand implements CommandExecutor {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
 
     public MapArtCommand() {
-        // Register subcommands
         register(new LockCommand());
         register(new UnlockCommand());
         register(new NameCommand());
@@ -23,8 +22,6 @@ public class MapArtCommand implements CommandExecutor {
         register(new VerifyCommand());
         register(new HelpCommand());
         register(new ExportCommand());
-
-
     }
 
     private void register(SubCommand subCommand) {
@@ -34,7 +31,7 @@ public class MapArtCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-        	sender.sendMessage("§cUsage: /mapart <lock | unlock | name | credit | menu | info | audit>");
+            sender.sendMessage("§cUsage: /mapart <lock | unlock | name | credit | menu | info | audit | verify | help | export>");
             return true;
         }
 

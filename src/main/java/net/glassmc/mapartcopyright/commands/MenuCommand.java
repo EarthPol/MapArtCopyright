@@ -21,7 +21,7 @@ public class MenuCommand implements SubCommand {
         }
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null || !(item.getItemMeta() instanceof MapMeta)) {
+        if (item == null || item.getItemMeta() == null || !(item.getItemMeta() instanceof MapMeta)) {
             player.sendMessage("§cYou must be holding a filled map to use this.");
             return;
         }

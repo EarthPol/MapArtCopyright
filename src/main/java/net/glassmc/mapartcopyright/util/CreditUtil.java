@@ -1,5 +1,6 @@
 package net.glassmc.mapartcopyright.util;
 
+import net.glassmc.mapartcopyright.api.MapArtAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -18,15 +19,29 @@ public class CreditUtil {
     }
 
     /**
-     * Sets the creator's credit on a map.
+     * Sets the creator's credit on a map with security check.
+     * Only works if map is not locked or the player is the owner/admin.
      * @param item Map item
      * @param name Creator name
+     * @param player Player attempting to set the credit
+     * @return true if credit was successfully set
      */
-    public static void setCredit(ItemStack item, String name) {
-        if (!(item.getItemMeta() instanceof MapMeta meta)) return;
+    public static boolean setCredit(ItemStack item, String name, Player player) {
+        if (!(item.getItemMeta() instanceof MapMeta meta)) return false;
+
+        boolean locked = MapArtAPI.isLocked(item);
+        boolean isOwner = MapArtAPI.isOwner(player, item);
+        boolean isAdmin = player.hasPermission("mapart.admin");
+
+        if (locked && !isOwner && !isAdmin) {
+            player.sendMessage("§cYou cannot change the creator on a locked map you do not own.");
+            return false;
+        }
+
         meta.getPersistentDataContainer().set(LockUtil.CREDIT_KEY, PersistentDataType.STRING, name);
         item.setItemMeta(meta);
         LoreUtil.updateMapLore(item);
+        return true;
     }
 
     /**

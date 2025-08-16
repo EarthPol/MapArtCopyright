@@ -4,13 +4,18 @@
 # ╚════════════════════════════════════════════╝
 
 
+database:
+  type: h2  # mysql, sqlite, or h2
+
 mysql:
-  enabled: true
+  enabled: false
   host: localhost
   port: 3306
   database: mapart
-  username: mapartuser
-  password: securepassword123
+  username: root
+  password: ""
+  useSSL: false
+  allowPublicKeyRetrieval: true
 
 settings:
   default-lock-enabled: true         # Should maps be locked when /mapart lock is used

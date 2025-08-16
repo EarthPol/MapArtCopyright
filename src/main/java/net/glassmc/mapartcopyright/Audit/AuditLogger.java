@@ -14,10 +14,8 @@ public class AuditLogger {
         String time = LocalDateTime.now().toString();
         String message = "[" + time + "] " + playerName + " " + action + " map UUID: " + mapUUID;
 
-        // Log to console
         MapArtCopyright.getInstance().getLogger().info(message);
 
-        // Log to file
         try (FileWriter writer = new FileWriter(logFile, true)) {
             writer.write(message + "\n");
         } catch (IOException e) {

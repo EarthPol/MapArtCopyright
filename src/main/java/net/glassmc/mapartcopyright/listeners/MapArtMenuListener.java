@@ -1,9 +1,13 @@
 package net.glassmc.mapartcopyright.listeners;
 
+import net.glassmc.mapartcopyright.api.MapArtAPI;
 import net.glassmc.mapartcopyright.gui.MapArtGUI;
+import net.glassmc.mapartcopyright.util.CreditUtil;
 import net.glassmc.mapartcopyright.util.InputManager;
 import net.glassmc.mapartcopyright.util.LockUtil;
 import net.glassmc.mapartcopyright.util.LoreUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,9 +34,38 @@ public class MapArtMenuListener implements Listener {
         ItemStack map = player.getInventory().getItemInMainHand();
 
         switch (type) {
-            case ANVIL -> handleInput(player, "mapart.rename", InputManager.InputType.RENAME_MAP, map, "rename maps");
+            case ANVIL -> {
+                if (!player.hasPermission("mapart.rename")) {
+                    player.sendMessage(Component.text("You don’t have permission to rename maps.", NamedTextColor.RED));
+                    return;
+                }
+                if (MapArtAPI.isLocked(map) && !MapArtAPI.isOwner(player, map) && !player.hasPermission("mapart.admin")) {
+                    player.sendMessage(Component.text("This map is locked and you are not the owner.", NamedTextColor.RED));
+                    return;
+                }
+                InputManager.ask(player, InputManager.InputType.RENAME_MAP, map);
+            }
+
             case WRITABLE_BOOK -> handleInput(player, "mapart.credit", InputManager.InputType.SET_CREDIT, map, "set creator names");
-            case PLAYER_HEAD -> executeCommand(player, "mapart.credit", "mapart credit " + player.getName(), "set creator names");
+
+            case PLAYER_HEAD -> {
+                if (!(map.getItemMeta() instanceof MapMeta)) {
+                    player.sendMessage(Component.text("You must be holding a filled map.", NamedTextColor.RED));
+                    return;
+                }
+                if (!player.hasPermission("mapart.credit")) {
+                    player.sendMessage(Component.text("You don’t have permission to set creator names.", NamedTextColor.RED));
+                    return;
+                }
+                boolean success = CreditUtil.setCredit(map, player.getName(), player);
+                if (success) {
+                    player.sendMessage(Component.text("Creator set to: ", NamedTextColor.GREEN)
+                        .append(Component.text(player.getName(), NamedTextColor.WHITE)));
+                    player.getInventory().setItemInMainHand(map);
+                    MapArtGUI.open(player, map);
+                }
+            }
+
             case ITEM_FRAME -> executeCommand(player, "mapart.lock", "mapart lock", "lock maps");
             case FILLED_MAP -> executeCommand(player, "mapart.unlock", "mapart unlock", "unlock maps");
             case BARRIER -> player.closeInventory();
@@ -45,7 +78,7 @@ public class MapArtMenuListener implements Listener {
         if (player.hasPermission(permission)) {
             InputManager.ask(player, type, map);
         } else {
-            player.sendMessage("§cYou don’t have permission to " + action + ".");
+            player.sendMessage(Component.text("You don’t have permission to " + action + ".", NamedTextColor.RED));
         }
     }
 
@@ -53,18 +86,26 @@ public class MapArtMenuListener implements Listener {
         if (player.hasPermission(permission)) {
             player.performCommand(command);
         } else {
-            player.sendMessage("§cYou don’t have permission to " + action + ".");
+            player.sendMessage(Component.text("You don’t have permission to " + action + ".", NamedTextColor.RED));
         }
     }
 
     private void handleToggle(Player player, String displayName, ItemStack map) {
         if (!(map.getItemMeta() instanceof MapMeta meta)) return;
+
+        boolean locked = MapArtAPI.isLocked(map);
+        boolean isOwner = MapArtAPI.isOwner(player, map);
+        if (locked && !isOwner && !player.hasPermission("mapart.admin")) {
+            player.sendMessage(Component.text("This map is locked and you are not the owner.", NamedTextColor.RED));
+            return;
+        }
+
         boolean metaChanged = false;
 
         // Toggle Map Name Visibility
         if (displayName.contains("Map Name")) {
             if (!player.hasPermission("mapart.toggle.displayname")) {
-                player.sendMessage("§cYou don’t have permission to toggle the map name.");
+                player.sendMessage(Component.text("You don’t have permission to toggle the map name.", NamedTextColor.RED));
                 return;
             }
 
@@ -72,11 +113,11 @@ public class MapArtMenuListener implements Listener {
             if (nameShown) {
                 meta.setDisplayName(null);
                 meta.getPersistentDataContainer().set(LockUtil.MAPART_NAME_VISIBLE_KEY, PersistentDataType.BYTE, (byte) 0);
-                player.sendMessage("§7Map name §chidden§7.");
+                player.sendMessage(Component.text("Map name hidden.", NamedTextColor.GRAY));
             } else {
                 meta.setDisplayName("§fUntitled Map");
                 meta.getPersistentDataContainer().set(LockUtil.MAPART_NAME_KEY, PersistentDataType.BYTE, (byte) 1);
-                player.sendMessage("§aMap name §ashown§7.");
+                player.sendMessage(Component.text("Map name shown.", NamedTextColor.GREEN));
             }
 
             metaChanged = true;
@@ -85,7 +126,7 @@ public class MapArtMenuListener implements Listener {
         // Toggle Creator Hologram
         if (displayName.contains("Creator Hologram")) {
             if (!player.hasPermission("mapart.toggle.hologram")) {
-                player.sendMessage("§cYou don’t have permission to toggle the creator tag.");
+                player.sendMessage(Component.text("You don’t have permission to toggle the creator tag.", NamedTextColor.RED));
                 return;
             }
 
@@ -94,7 +135,7 @@ public class MapArtMenuListener implements Listener {
             byte newState = current == 1 ? (byte) 0 : (byte) 1;
 
             meta.getPersistentDataContainer().set(LockUtil.HOLOGRAM_VISIBLE_KEY, PersistentDataType.BYTE, newState);
-            player.sendMessage("§7Creator tag " + (newState == 1 ? "§ashown§7." : "§chidden§7."));
+            player.sendMessage(Component.text("Creator tag " + (newState == 1 ? "shown." : "hidden."), NamedTextColor.GRAY));
             metaChanged = true;
         }
 
@@ -102,8 +143,7 @@ public class MapArtMenuListener implements Listener {
             map.setItemMeta(meta);
             LoreUtil.updateMapLore(map);
             player.getInventory().setItemInMainHand(map);
-            MapArtGUI.open(player, map); // Re-open GUI to reflect toggle visually
+            MapArtGUI.open(player, map); // Refresh GUI
         }
     }
-
 }

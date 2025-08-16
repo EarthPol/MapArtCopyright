@@ -22,12 +22,11 @@ public class CreditCommand implements SubCommand {
             sender.sendMessage("§cOnly players can set credit.");
             return;
         }
-        
+
         if (!player.hasPermission("mapart.credit")) {
             player.sendMessage("§cYou don’t have permission to do this.");
             return;
         }
-
 
         if (args.length < 2) {
             player.sendMessage("§cUsage: /mapart credit <name>");
@@ -37,12 +36,15 @@ public class CreditCommand implements SubCommand {
         String credit = String.join(" ", args).substring(args[0].length()).trim();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (item == null || !item.hasItemMeta()) {
+        if (item == null || item.getItemMeta() == null || !(item.getItemMeta() instanceof MapMeta)) {
             player.sendMessage("§cHold a filled map to credit it.");
             return;
         }
 
-        CreditUtil.setCredit(item, credit);
-        player.sendMessage("§aMap credited to: " + credit);
+        boolean success = CreditUtil.setCredit(item, credit, player);
+        if (success) {
+            player.sendMessage("§aMap credited to: §f" + credit);
+            player.getInventory().setItemInMainHand(item);
+        }
     }
 }

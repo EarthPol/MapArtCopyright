@@ -7,6 +7,7 @@ import net.glassmc.mapartcopyright.economy.EconomyHandler;
 import net.glassmc.mapartcopyright.listeners.ChatInputListener;
 import net.glassmc.mapartcopyright.listeners.MapArtMenuListener;
 import net.glassmc.mapartcopyright.listeners.MapFrameListener;
+import net.glassmc.mapartcopyright.listeners.MapInteractionListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -31,22 +32,21 @@ public final class MapArtCopyright extends JavaPlugin {
         pm.registerEvents(new MapFrameListener(), this);
         pm.registerEvents(new MapArtMenuListener(), this);
         pm.registerEvents(new ChatInputListener(), this);
+        pm.registerEvents(new MapInteractionListener(), this);
 
-        // Vault economy setup
         if (!EconomyHandler.setup()) {
             getLogger().warning("Vault not found or no economy provider detected.");
         }
-        // CMILib
         if (Bukkit.getPluginManager().getPlugin("CMILib") == null) {
             getLogger().warning("CMILib not found! Some features may not work properly.");
         } else {
             getLogger().info("CMILib detected and hooked.");
         }
-
     }
 
     @Override
     public void onDisable() {
+        OwnershipDatabase.close();
         getLogger().info("MapArtCopyright plugin disabled.");
     }
 
