@@ -1,12 +1,13 @@
 name: MapArtCopyright
-version: 1.0.0
+version: 1.1.1
 main: net.glassmc.mapartcopyright.MapArtCopyright
 api-version: 1.21
 author: GlassMC
 description: Adds copyright, naming, and locking features for map art
 
 
-depend: [Vault, CMILib]
+depend: [Vault]
+softdepend: [CMILib]
 
 
 commands:
@@ -48,38 +49,50 @@ permissions:
     description: Toggle creator hologram in GUI
     default: true
 
-mapart.bypass:
-  description: Allows bypassing map ownership restrictions
-  default: op
+  mapart.toggle.itemframe:
+    description: Toggle item frame locking in GUI
+    default: true
 
-mapart.info:
-  description: Allows viewing UUID and metadata of a map
-  default: op
+  mapart.bypass:
+    description: Allows bypassing map ownership restrictions
+    default: op
+
+  mapart.info:
+    description: Allows viewing UUID and metadata of a map
+    default: op
 
   mapart.audit:
     description: View audit logs for a specific map
     default: op
 
-mapart.verify:
-  description: Allows players to verify their own map art
-  default: true
+  mapart.verify:
+    description: Allows players to verify their own map art
+    default: true
 
-mapart.verify.others:
-  description: Allows admins to verify other players' map art
-  default: op
-  
-mapart.*:
-  description: Grants access to all MapArtCopyright features
-  default: op
-  children:
-    mapart.use: true
-    mapart.lock: true
-    mapart.unlock: true
-    mapart.credit: true
-    mapart.rename: true
-    mapart.menu: true
-    mapart.toggle.displayname: true
-    mapart.toggle.hologram: true
-    mapart.bypass: true
-    mapart.info: true
-    mapart.audit: true
+  mapart.verify.others:
+    description: Allows admins to verify other players' map art
+    default: op
+
+  mapart.export:
+    description: Allows exporting the ownership database to CSV
+    default: op
+
+  mapart.*:
+    description: Grants access to all MapArtCopyright features
+    default: op
+    children:
+      mapart.use: true
+      mapart.lock: true
+      mapart.unlock: true
+      mapart.credit: true
+      mapart.rename: true
+      mapart.menu: true
+      mapart.toggle.displayname: true
+      mapart.toggle.hologram: true
+      mapart.toggle.itemframe: true
+      mapart.bypass: true
+      mapart.info: true
+      mapart.audit: true
+      mapart.verify: true
+      mapart.verify.others: true
+      mapart.export: true
