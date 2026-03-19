@@ -5,7 +5,6 @@ import net.glassmc.mapartcopyright.database.OwnershipDatabase;
 import net.glassmc.mapartcopyright.database.MapRecord;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -21,8 +20,8 @@ public class ExportCommand implements SubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player player) || !player.isOp()) {
-            sender.sendMessage("§cThis test command is for server operators only.");
+        if (!sender.hasPermission("mapart.export")) {
+            sender.sendMessage("§cYou don't have permission to export the database.");
             return;
         }
 
@@ -38,14 +37,14 @@ public class ExportCommand implements SubCommand {
             writer.write("map_uuid,player_uuid,map_name,creator_name\n");
             for (MapRecord r : records) {
                 writer.write(String.format("%s,%s,%s,%s\n",
-                        r.mapUUID,
+                        r.mapUUID != null ? r.mapUUID : "",
                         r.playerUUID,
                         r.mapName != null ? r.mapName.replace(",", " ") : "",
                         r.creatorName != null ? r.creatorName.replace(",", " ") : ""));
             }
-            player.sendMessage("§aExport complete: §f" + file.getName());
+            sender.sendMessage("§aExport complete: §f" + file.getName());
         } catch (IOException e) {
-            player.sendMessage("§cExport failed: " + e.getMessage());
+            sender.sendMessage("§cExport failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

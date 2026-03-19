@@ -15,7 +15,7 @@ public class PermissionUtil {
     }
 
     public static boolean canModify(Player player, ItemStack map, Component message) {
-        if (MapArtAPI.isLocked(map) && !MapArtAPI.isOwner(player, map) && !player.hasPermission("mapart.admin")) {
+        if (MapArtAPI.isLocked(map) && !MapArtAPI.isOwner(player, map) && !player.hasPermission("mapart.bypass")) {
             player.sendMessage(message);
             return false;
         }

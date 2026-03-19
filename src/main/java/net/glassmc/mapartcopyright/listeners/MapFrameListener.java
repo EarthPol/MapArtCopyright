@@ -1,5 +1,6 @@
 package net.glassmc.mapartcopyright.listeners;
 
+import net.glassmc.mapartcopyright.MapArtCopyright;
 import net.glassmc.mapartcopyright.util.HologramUtil;
 import net.glassmc.mapartcopyright.util.LockUtil;
 import net.glassmc.mapartcopyright.Audit.AuditLogger;
@@ -28,7 +29,7 @@ public class MapFrameListener implements Listener {
         // Allow any player to remove a map (no ownership check for removal)
         // Handle map insertion (spawning holograms) and log removals
         Bukkit.getScheduler().runTaskLater(
-            Bukkit.getPluginManager().getPlugin("MapArtCopyright"),
+            MapArtCopyright.getInstance(),
             () -> {
                 ItemStack newItem = frame.getItem();
                 if (newItem.getType() != Material.FILLED_MAP) {
@@ -77,7 +78,7 @@ public class MapFrameListener implements Listener {
             String mapUUID = MapArtAPI.getMapUUID(frameItem);
             if (mapUUID != null && event.getDamager() instanceof Player player) {
                 boolean isOwner = MapArtAPI.isOwner(player, frameItem);
-                boolean hasBypass = player.hasPermission("mapart.bypass") || player.hasPermission("mapart.admin");
+                boolean hasBypass = player.hasPermission("mapart.bypass");
                 if (!isOwner && !hasBypass) {
                     player.sendMessage("§cYou cannot break this item frame containing a locked map.");
                     event.setCancelled(true);

@@ -153,7 +153,15 @@ public class OwnershipDatabase {
                     INSERT OR REPLACE INTO map_ownership (map_uuid, player_uuid, map_name, creator_name)
                     VALUES (?, ?, ?, ?)
                 """;
+            } else if ("h2".equals(dbType)) {
+                // H2 uses MERGE INTO syntax; ON DUPLICATE KEY UPDATE is MySQL-only
+                sql = """
+                    MERGE INTO map_ownership (map_uuid, player_uuid, map_name, creator_name)
+                    KEY(map_uuid)
+                    VALUES (?, ?, ?, ?)
+                """;
             } else {
+                // MySQL
                 sql = """
                     INSERT INTO map_ownership (map_uuid, player_uuid, map_name, creator_name)
                     VALUES (?, ?, ?, ?)

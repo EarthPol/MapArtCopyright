@@ -1,12 +1,14 @@
 package net.glassmc.mapartcopyright.commands;
 
+import net.glassmc.mapartcopyright.api.MapArtAPI;
+import net.glassmc.mapartcopyright.util.LoreUtil;
+import net.glassmc.mapartcopyright.util.StringSanitizer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-
-import net.glassmc.mapartcopyright.api.MapArtAPI;
-import net.glassmc.mapartcopyright.util.LoreUtil;
 
 public class NameCommand implements SubCommand {
 
@@ -22,8 +24,8 @@ public class NameCommand implements SubCommand {
             return;
         }
 
-        if (!player.hasPermission("mapart.name")) {
-            player.sendMessage("§cYou don’t have permission to do this.");
+        if (!player.hasPermission("mapart.rename")) {
+            player.sendMessage("§cYou don't have permission to do this.");
             return;
         }
 
@@ -33,28 +35,31 @@ public class NameCommand implements SubCommand {
         }
 
         String title = String.join(" ", args).substring(args[0].length()).trim();
-        if (title.length() > 32) {
-            player.sendMessage("§cName too long. Max 32 characters.");
-            return;
-        }
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null || item.getItemMeta() == null || !(item.getItemMeta() instanceof MapMeta)) {
+        if (!(item.getItemMeta() instanceof MapMeta meta)) {
             player.sendMessage("§cHold a filled map to name it.");
             return;
         }
 
         boolean locked = MapArtAPI.isLocked(item);
         boolean isOwner = MapArtAPI.isOwner(player, item);
-        if (locked && !isOwner && !player.hasPermission("mapart.admin")) {
+        if (locked && !isOwner && !player.hasPermission("mapart.bypass")) {
             player.sendMessage("§cThis map is locked and you are not the owner.");
             return;
         }
 
-        MapMeta meta = (MapMeta) item.getItemMeta();
-        meta.setDisplayName(title);
+        Component name;
+        try {
+            name = StringSanitizer.parseComponent(title, 32);
+        } catch (IllegalArgumentException ex) {
+            player.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
+            return;
+        }
+
+        meta.displayName(name);
         item.setItemMeta(meta);
         LoreUtil.updateMapLore(item);
-        player.sendMessage("§aMap named: §f" + title);
+        player.sendMessage(Component.text("Map named: ", NamedTextColor.GREEN).append(name));
     }
 }

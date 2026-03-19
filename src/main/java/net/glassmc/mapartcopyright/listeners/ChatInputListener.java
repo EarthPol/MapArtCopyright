@@ -37,7 +37,7 @@ public class ChatInputListener implements Listener {
         String rawInput = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
 
         ItemStack item = InputManager.getHeldMap(player);
-        if (!(item.getItemMeta() instanceof MapMeta meta)) {
+        if (item == null || !(item.getItemMeta() instanceof MapMeta meta)) {
             player.sendMessage(Component.text("Error: no valid map found.", NamedTextColor.RED));
             InputManager.clear(player);
             return;

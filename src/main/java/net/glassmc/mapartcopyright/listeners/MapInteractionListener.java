@@ -35,7 +35,7 @@ public class MapInteractionListener implements Listener {
         }
 
         boolean isOwner = MapArtAPI.isOwner(player, source);
-        boolean hasBypass = player.hasPermission("mapart.bypass") || player.hasPermission("mapart.admin");
+        boolean hasBypass = player.hasPermission("mapart.bypass");
         if (!isOwner && !hasBypass) {
             player.sendMessage("§cYou cannot clone this locked map.");
             event.setCancelled(true);
@@ -76,7 +76,7 @@ public class MapInteractionListener implements Listener {
 
         // Check ownership or permissions
         boolean isOwner = MapArtAPI.isOwner(player, source);
-        boolean hasBypass = player.hasPermission("mapart.bypass") || player.hasPermission("mapart.admin");
+        boolean hasBypass = player.hasPermission("mapart.bypass");
         if (!isOwner && !hasBypass) {
             player.sendMessage("§cYou cannot clone or scale this locked map.");
             event.setCancelled(true);
