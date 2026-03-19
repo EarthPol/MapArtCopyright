@@ -1,5 +1,8 @@
 package net.glassmc.mapartcopyright.util;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -14,18 +17,20 @@ public class LoreUtil {
 
         String credit = meta.getPersistentDataContainer().get(LockUtil.CREDIT_KEY, PersistentDataType.STRING);
 
-        List<String> lore = new ArrayList<>();
+        List<Component> lore = new ArrayList<>();
         if (credit != null) {
-            lore.add("§7Creator: §f" + credit);
+            lore.add(Component.text("Creator: ", NamedTextColor.GRAY)
+                    .append(Component.text(credit, NamedTextColor.WHITE))
+                    .decoration(TextDecoration.ITALIC, false));
         }
 
-        // Optionally show locked status
         Byte locked = meta.getPersistentDataContainer().get(LockUtil.LOCK_KEY, PersistentDataType.BYTE);
         if (locked != null && locked == (byte) 1) {
-            lore.add("§cLocked");
+            lore.add(Component.text("Locked", NamedTextColor.RED)
+                    .decoration(TextDecoration.ITALIC, false));
         }
 
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
     }
 }

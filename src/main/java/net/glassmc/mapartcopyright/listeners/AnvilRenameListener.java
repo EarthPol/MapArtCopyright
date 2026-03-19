@@ -5,6 +5,7 @@ import net.glassmc.mapartcopyright.api.MapArtAPI;
 import net.glassmc.mapartcopyright.util.StringSanitizer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,12 +19,12 @@ import org.bukkit.inventory.meta.MapMeta;
 public class AnvilRenameListener implements Listener {
 
     private boolean canRename(Player player, ItemStack item) {
-        if (!player.hasPermission("mapart.name")) {
+        if (!player.hasPermission("mapart.rename")) {
             return false;
         }
         boolean locked = MapArtAPI.isLocked(item);
         boolean isOwner = MapArtAPI.isOwner(player, item);
-        boolean hasBypass = player.hasPermission("mapart.bypass") || player.hasPermission("mapart.admin");
+        boolean hasBypass = player.hasPermission("mapart.bypass");
         return !locked || isOwner || hasBypass;
     }
 
@@ -36,7 +37,7 @@ public class AnvilRenameListener implements Listener {
         String rename = inv.getRenameText();
         if (rename == null) return;
         MapMeta meta = (MapMeta) input.getItemMeta();
-        if (rename.isBlank() || (meta.hasDisplayName() && rename.equals(meta.getDisplayName()))) return;
+        if (rename.isBlank() || (meta.hasDisplayName() && rename.equals(PlainTextComponentSerializer.plainText().serialize(meta.displayName())))) return;
 
         Player player = (Player) event.getView().getPlayer();
         if (!canRename(player, input)) {
@@ -69,12 +70,12 @@ public class AnvilRenameListener implements Listener {
         String rename = inv.getRenameText();
         if (rename == null) return;
         MapMeta meta = (MapMeta) input.getItemMeta();
-        if (rename.isBlank() || (meta.hasDisplayName() && rename.equals(meta.getDisplayName()))) return;
+        if (rename.isBlank() || (meta.hasDisplayName() && rename.equals(PlainTextComponentSerializer.plainText().serialize(meta.displayName())))) return;
 
         String mapUUID = MapArtAPI.getMapUUID(input);
         if (!canRename(player, input)) {
             event.setCancelled(true);
-            if (!player.hasPermission("mapart.name")) {
+            if (!player.hasPermission("mapart.rename")) {
                 player.sendMessage("§cYou don’t have permission to rename maps.");
             } else {
                 player.sendMessage("§cThis map is locked and you are not the owner.");

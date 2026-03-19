@@ -23,8 +23,8 @@ public class MapDropListener implements Listener {
         // Only sanitize maps tracked by the plugin (those with a stored UUID).
         if (!meta.getPersistentDataContainer().has(LockUtil.MAPART_ID_KEY, PersistentDataType.STRING)) return;
 
-        meta.setDisplayName(null);
-        meta.setLore(null);
+        meta.displayName(null);
+        meta.lore(null);
         item.setItemMeta(meta);
         event.getEntity().setItemStack(item);
     }

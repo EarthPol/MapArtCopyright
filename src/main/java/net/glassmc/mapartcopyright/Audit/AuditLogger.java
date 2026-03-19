@@ -8,7 +8,10 @@ import java.time.LocalDateTime;
 
 public class AuditLogger {
 
-    private static final File logFile = new File(MapArtCopyright.getInstance().getDataFolder(), "audit.log");
+    // Lazily resolved so this class can be loaded before onEnable() sets the instance
+    private static File getLogFile() {
+        return new File(MapArtCopyright.getInstance().getDataFolder(), "audit.log");
+    }
 
     public static void log(String action, String playerName, String mapUUID) {
         String time = LocalDateTime.now().toString();
@@ -16,7 +19,7 @@ public class AuditLogger {
 
         MapArtCopyright.getInstance().getLogger().info(message);
 
-        try (FileWriter writer = new FileWriter(logFile, true)) {
+        try (FileWriter writer = new FileWriter(getLogFile(), true)) {
             writer.write(message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
