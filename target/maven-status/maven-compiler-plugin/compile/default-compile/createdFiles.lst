@@ -1,6 +1,11 @@
-net\glassmc\mapartcopyright\database\MapRecord.class
-net\glassmc\mapartcopyright\commands\InfoCommand.class
-net\glassmc\mapartcopyright\util\InputManager$InputType.class
 net\glassmc\mapartcopyright\util\InputManager.class
-net\glassmc\mapartcopyright\util\UnlockUtil.class
+net\glassmc\mapartcopyright\listeners\AnvilRenameListener.class
+net\glassmc\mapartcopyright\database\MapRecord.class
+net\glassmc\mapartcopyright\listeners\ChatInputListener$1.class
+net\glassmc\mapartcopyright\listeners\MapDropListener.class
+net\glassmc\mapartcopyright\listeners\MapArtMenuListener$1.class
+net\glassmc\mapartcopyright\util\InputManager$InputType.class
+net\glassmc\mapartcopyright\commands\InfoCommand.class
 net\glassmc\mapartcopyright\commands\SubCommand.class
+net\glassmc\mapartcopyright\util\UnlockUtil.class
+net\glassmc\mapartcopyright\util\PermissionUtil.class
