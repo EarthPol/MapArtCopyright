@@ -31,6 +31,7 @@ public class ChatInputListener implements Listener {
         if (!InputManager.has(player)) return;
 
         event.setCancelled(true);
+        event.viewers().clear();
 
         // Extract and sanitize input from Adventure Component
         String rawInput = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
