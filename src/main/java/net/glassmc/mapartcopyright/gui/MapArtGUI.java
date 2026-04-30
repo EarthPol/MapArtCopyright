@@ -24,10 +24,10 @@ import java.util.List;
 
 public class MapArtGUI {
 
-    public static final String GUI_TITLE = "§8MapArt Manager";
+    public static final String GUI_TITLE = "§8MapArt Menu";
 
     /*
-     * New layout (45 slots, 5 rows × 9 cols):
+     * Old layout (45 slots, 5 rows × 9 cols):
      *
      * Row 0:  [ANVIL:Rename] [PAPER:MapName] [NAME_TAG:ToggleMapName] [fill] [lbl] [lbl] [fill] [fill] [BOOK:Creator]
      *          0              1               2                         3      4     5      6      7      8
@@ -53,10 +53,10 @@ public class MapArtGUI {
      *   Map Name        : icon=33, pane=42  (also accessible via slot 2 in row 0)
      */
     public static void open(Player player, ItemStack mapItem) {
-        Inventory gui = Bukkit.createInventory(null, 45, GUI_TITLE);
+        Inventory gui = Bukkit.createInventory(null, 27, GUI_TITLE);
 
         ItemStack filler = item(Material.GRAY_STAINED_GLASS_PANE, Component.text(" "));
-        for (int i = 0; i < 45; i++) gui.setItem(i, filler);
+        for (int i = 0; i < 27; i++) gui.setItem(i, filler);
 
         MapMeta meta = (MapMeta) mapItem.getItemMeta();
         boolean locked      = MapArtAPI.isLocked(mapItem);
@@ -68,13 +68,10 @@ public class MapArtGUI {
         String  mapUUID     = MapArtAPI.getMapUUID(mapItem);
         String  credit      = CreditUtil.getCredit(mapItem);
 
+
+        /*
         // ── Row 0: Display section ─────────────────────────────────────────────
 
-        // Slot 0 — Rename Map
-        List<Component> renameLore = lore(
-                txt("Click to enter a new map display name.", NamedTextColor.GRAY));
-        if (!player.hasPermission("mapart.rename")) renameLore.add(noPerms());
-        gui.setItem(0, item(Material.ANVIL, txt("Rename Map", NamedTextColor.YELLOW), renameLore));
 
         // Slot 1 — Map name display + UUID info
         String displayedName = MapArtAPI.getStoredMapName(mapItem).orElse(null);
@@ -101,18 +98,25 @@ public class MapArtGUI {
                 txt("Click to enter a custom creator name.", NamedTextColor.GRAY));
         if (!player.hasPermission("mapart.credit")) creatorInputLore.add(noPerms());
         gui.setItem(8, item(Material.WRITABLE_BOOK, txt("Change Creator Name", NamedTextColor.YELLOW), creatorInputLore));
+        */
 
-        // ── Row 1: Lock status bar ─────────────────────────────────────────────
+        // ── Row 0: Lock status bar ─────────────────────────────────────────────
         Material statusMat  = locked ? Material.RED_STAINED_GLASS_PANE : Material.LIME_STAINED_GLASS_PANE;
         Component statusName = locked
                 ? txt("● Map Locked",   NamedTextColor.RED)
                 : txt("● Map Unlocked", NamedTextColor.GREEN);
         ItemStack statusPane = item(statusMat, statusName);
-        for (int i = 9; i <= 17; i++) gui.setItem(i, statusPane);
+        for (int i = 0; i <= 8; i++) gui.setItem(i, statusPane);
 
-        // ── Row 2: Creator + Lock controls ────────────────────────────────────
+        // ── Row 1: Controls ────────────────────────────────────
 
-        // Slot 20 — Creator head
+        // Slot 11 — Rename Map
+        List<Component> renameLore = lore(
+                txt("Click to enter a new map display name.", NamedTextColor.GRAY));
+        if (!player.hasPermission("mapart.rename")) renameLore.add(noPerms());
+        gui.setItem(11, item(Material.ANVIL, txt("Rename Map", NamedTextColor.YELLOW), renameLore));
+
+        // Slot 12 — Creator Head
         ItemStack head     = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
         if (credit != null) {
@@ -126,36 +130,42 @@ public class MapArtGUI {
         }
         headMeta.lore(lore(txt("Click to set yourself as creator.", NamedTextColor.GRAY)));
         head.setItemMeta(headMeta);
-        gui.setItem(20, head);
+        gui.setItem(12, head);
 
-        // Slot 21 — Section label
-        gui.setItem(21, sectionLabel("Lock"));
+        // Slot 13 - Map Info (FILLED_MAP)
+        gui.setItem(13, mapItem);
 
-        // Slot 22 — Lock Map (FILLED_MAP)
-        List<Component> lockLore = lore(txt("Click to lock this map.", NamedTextColor.GRAY));
-        if (!player.hasPermission("mapart.lock")) lockLore.add(noPerms());
-        gui.setItem(22, item(Material.FILLED_MAP, txt("Lock Map", NamedTextColor.RED), lockLore));
 
+        // Slot 14 — Toggle Lock (FILLED_MAP)
+        List<Component> lockLore = lore(txt("Click to toggle a lock on this map.", NamedTextColor.GRAY));
+        if (!locked) {
+            if (!player.hasPermission("mapart.lock")) lockLore.add(noPerms());
+            gui.setItem(14, item(Material.TRIAL_KEY, txt("Lock Map", NamedTextColor.RED), lockLore));
+        } else if (locked) {
+            List<Component> unlockLore = lore(txt("Click to unlock this map.", NamedTextColor.GRAY));
+            if (!player.hasPermission("mapart.unlock")) unlockLore.add(noPerms());
+            gui.setItem(14, item(Material.TRIAL_KEY, txt("Unlock Map", NamedTextColor.GREEN), unlockLore));
+        }
+        /*
         // Slot 24 — Unlock Map (FILLED_MAP)
         List<Component> unlockLore = lore(txt("Click to unlock this map.", NamedTextColor.GRAY));
         if (!player.hasPermission("mapart.unlock")) unlockLore.add(noPerms());
         gui.setItem(24, item(Material.FILLED_MAP, txt("Unlock Map", NamedTextColor.GREEN), unlockLore));
+        */
 
-        // ── Row 3: Toggle icons ────────────────────────────────────────────────
-
-        // Slots 27-28 — Section labels
-        ItemStack toggleLbl = sectionLabel("Toggles");
-        gui.setItem(27, toggleLbl);
-        gui.setItem(28, toggleLbl);
-
-        // Slot 30 — Item Frame Lock icon (ITEM_FRAME)
+        // Slot 15 — Item Frame Lock icon (ITEM_FRAME)
         List<Component> frameLockIconLore = lore(
                 Component.text("Item frame lock: ", NamedTextColor.GRAY)
                         .append(frameLocked ? txt("Enabled", NamedTextColor.GREEN) : txt("Disabled", NamedTextColor.RED)),
                 txt("Click to toggle.", NamedTextColor.GRAY));
         if (!player.hasPermission("mapart.toggle.itemframe")) frameLockIconLore.add(noPerms());
-        gui.setItem(30, item(Material.ITEM_FRAME, txt("Toggle Item Frame Lock", NamedTextColor.YELLOW), frameLockIconLore));
+        gui.setItem(15, item(Material.ITEM_FRAME, txt("Toggle Item Frame Lock", NamedTextColor.YELLOW), frameLockIconLore));
 
+        // ── Row 3: Back Button ────────────────────────────────────────────────
+
+        gui.setItem(22, item(Material.BARRIER, txt("Close Menu", NamedTextColor.RED),
+                lore(txt("Click to exit.", NamedTextColor.GRAY))));
+        /*
         // Slot 32 — Creator Hologram icon (ENDER_EYE)
         List<Component> holoIconLore = lore(
                 Component.text("Creator hologram: ", NamedTextColor.GRAY)
@@ -166,7 +176,7 @@ public class MapArtGUI {
 
         // Slot 33 — Map Name icon (NAME_TAG, mirrors slot 2)
         gui.setItem(33, buildNameToggle(player, nameVisible));
-
+/*
         // ── Row 4: Toggle state panes + Close ─────────────────────────────────
 
         // Slot 39 — Item Frame Lock state pane (below icon at slot 30)
@@ -183,10 +193,8 @@ public class MapArtGUI {
         Material namePaneMat = nameVisible ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
         gui.setItem(42, item(namePaneMat, txt("Toggle Map Name", NamedTextColor.YELLOW),
                 lore(txt(nameVisible ? "Click to hide." : "Click to show.", NamedTextColor.GRAY))));
-
-        // Slot 44 — Close
-        gui.setItem(44, item(Material.BARRIER, txt("Close Menu", NamedTextColor.RED),
-                lore(txt("Click to exit.", NamedTextColor.GRAY))));
+*/
+        // Slot 22 — Close
 
         player.openInventory(gui);
     }
