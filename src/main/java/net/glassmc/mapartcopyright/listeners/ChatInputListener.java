@@ -19,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 
@@ -86,13 +85,14 @@ public class ChatInputListener implements Listener {
         LoreUtil.updateMapLore(item);
         player.getInventory().setItemInMainHand(item);
 
-        new BukkitRunnable() {
+       /*  new BukkitRunnable() {
             @Override
             public void run() {
                 MapArtGUI.open(player, item);
             }
         }.runTask(MapArtCopyright.getInstance());
-
-        InputManager.clear(player);
+        */
+        // Folia Safe Scheduler
+        player.getScheduler().run(MapArtCopyright.getInstance(), (scheduledTask) -> MapArtGUI.open(player, item), null);
     }
 }
