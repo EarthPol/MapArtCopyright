@@ -1,11 +1,8 @@
 package net.glassmc.mapartcopyright.listeners;
 
+import net.glassmc.mapartcopyright.api.MapArtAPI;
 import net.glassmc.mapartcopyright.gui.MapArtGUI;
-import net.glassmc.mapartcopyright.util.CreditUtil;
-import net.glassmc.mapartcopyright.util.InputManager;
-import net.glassmc.mapartcopyright.util.LockUtil;
-import net.glassmc.mapartcopyright.util.LoreUtil;
-import net.glassmc.mapartcopyright.util.PermissionUtil;
+import net.glassmc.mapartcopyright.util.*;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,12 +41,15 @@ public class MapArtMenuListener implements Listener {
 
         // Slot-based dispatch takes priority (resolves FILLED_MAP ambiguity between Lock and Unlock)
         switch (slot) {
-            case 22 -> executeCommand(player, "mapart.lock",   "mapart lock",   "lock maps");
-            case 24 -> executeCommand(player, "mapart.unlock", "mapart unlock", "unlock maps");
-            case 44 -> player.closeInventory();
             default -> {
                 // Material-based dispatch for all unambiguous items
                 switch (type) {
+                    case TRIAL_KEY     -> {if (MapArtAPI.getOwner(map) == player.getUniqueId()) {
+                        toggleLock(player, map);
+                        player.closeInventory();
+                        MapArtGUI.open(player, map);
+                    }}
+                    case BARRIER       -> player.closeInventory();
                     case ANVIL         -> handleRename(player, map);
                     case WRITABLE_BOOK -> handleInput(player, "mapart.credit",
                                                 InputManager.InputType.SET_CREDIT, map, "set creator names");
@@ -84,6 +84,23 @@ public class MapArtMenuListener implements Listener {
             InputManager.ask(player, type, map);
         } else {
             player.sendMessage(Component.text("You don't have permission to " + action + ".", NamedTextColor.RED));
+        }
+    }
+
+    private void toggleLock(Player player, ItemStack map) {
+        if (MapArtAPI.getOwner(map) != player.getUniqueId()) return;
+        if (UnlockUtil.isLocked(map)) {
+            if (!player.hasPermission("mapart.unlock")) {
+                player.sendMessage(Component.text("You don't have permission to unlock maps.", NamedTextColor.RED));
+                return;
+            }
+            executeCommand(player, "mapart.unlock", "mapart unlock", "unlock");
+        } else if (!UnlockUtil.isLocked(map)) {
+            if (!player.hasPermission("mapart.lock")) {
+                player.sendMessage(Component.text("You don't have permission to lock maps.", NamedTextColor.RED));
+                return;
+            }
+            UnlockUtil.unlock(map);
         }
     }
 

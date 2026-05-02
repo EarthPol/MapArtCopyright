@@ -6,8 +6,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
-public class MenuCommand implements SubCommand {
+public class MenuCommand {
 
+    /*
     @Override
     public String getName() {
         return "menu";
@@ -28,4 +29,5 @@ public class MenuCommand implements SubCommand {
 
         MapArtGUI.open(player, item);
     }
+     */
 }
