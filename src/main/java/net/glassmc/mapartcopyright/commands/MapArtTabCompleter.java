@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class MapArtTabCompleter implements TabCompleter {
 
         private static final List<String> SUBCOMMANDS = Arrays.asList(
-                    "lock", "unlock", "name", "credit", "menu", "audit", "info", "verify", "help", "export"
+                    "lock", "unlock", "name", "credit", "audit", "info", "help", "export"
                 );
  
 
@@ -35,13 +35,14 @@ public class MapArtTabCompleter implements TabCompleter {
 	                return Collections.singletonList(player.getName());
 	            }
 	        }
-
+			/*
 	        if (args[0].equalsIgnoreCase("verify") && sender.hasPermission("mapart.verify.others")) {
 	            return Bukkit.getOnlinePlayers().stream()
 	                    .map(Player::getName)
 	                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
 	                    .collect(Collectors.toList());
 	        }
+			 */
 	    }
 
 	    return Collections.emptyList();

@@ -10,8 +10,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
 
-public class VerifyCommand implements SubCommand {
-
+public class VerifyCommand {
+/*
     @Override
     public String getName() {
         return "verify";
@@ -79,4 +79,6 @@ public class VerifyCommand implements SubCommand {
             sender.sendMessage("§cVerification failed: malformed creator UUID.");
         }
     }
+
+ */
 }
